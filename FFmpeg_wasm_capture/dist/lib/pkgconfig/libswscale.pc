@@ -1,0 +1,14 @@
+prefix=/mnt/d/WorkSpace/emsdk/wasmlearning/FFMPEGSDK/FFmpeg_4.x/../dist
+exec_prefix=${prefix}
+libdir=/mnt/d/WorkSpace/emsdk/wasmlearning/FFMPEGSDK/FFmpeg_4.x/../dist/lib
+includedir=/mnt/d/WorkSpace/emsdk/wasmlearning/FFMPEGSDK/FFmpeg_4.x/../dist/include
+
+Name: libswscale
+Description: FFmpeg image rescaling library
+Version: 5.8.100
+Requires: libavutil >= 56.60.100
+Requires.private: 
+Conflicts:
+Libs: -L${libdir}  -lswscale -lm
+Libs.private: 
+Cflags: -I${includedir}

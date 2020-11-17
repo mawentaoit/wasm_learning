@@ -1,0 +1,14 @@
+prefix=/mnt/d/WorkSpace/emsdk/wasmlearning/FFMPEGSDK/ffmpeg-3.4.8/../dist
+exec_prefix=${prefix}
+libdir=/mnt/d/WorkSpace/emsdk/wasmlearning/FFMPEGSDK/ffmpeg-3.4.8/../dist/lib
+includedir=/mnt/d/WorkSpace/emsdk/wasmlearning/FFMPEGSDK/ffmpeg-3.4.8/../dist/include
+
+Name: libavutil
+Description: FFmpeg utility library
+Version: 55.78.100
+Requires: 
+Requires.private: 
+Conflicts:
+Libs: -L${libdir}  -lavutil -lm
+Libs.private: 
+Cflags: -I${includedir}

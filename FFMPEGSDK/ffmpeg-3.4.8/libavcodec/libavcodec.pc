@@ -1,0 +1,14 @@
+prefix=/mnt/d/WorkSpace/emsdk/wasmlearning/FFMPEGSDK/ffmpeg-3.4.8/../dist
+exec_prefix=${prefix}
+libdir=/mnt/d/WorkSpace/emsdk/wasmlearning/FFMPEGSDK/ffmpeg-3.4.8/../dist/lib
+includedir=/mnt/d/WorkSpace/emsdk/wasmlearning/FFMPEGSDK/ffmpeg-3.4.8/../dist/include
+
+Name: libavcodec
+Description: FFmpeg codec library
+Version: 57.107.100
+Requires: libswresample >= 2.9.100, libavutil >= 55.78.100
+Requires.private: 
+Conflicts:
+Libs: -L${libdir}  -lavcodec -s USE_SDL=2 -s USE_SDL=2 -lm
+Libs.private: 
+Cflags: -I${includedir}
