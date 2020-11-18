@@ -45,3 +45,13 @@ C导出的函数add()被封装为c_add(),这些封装方法与普通的JavaScrip
 虽然简化了字符串参数的交换，但是代价就是，输入参数为'string'/'array'时，ccall/cwrap在C环境的栈上分配了相应的空间，并将数据拷入了其中
 然后调用相应的导出函数。
 所以频繁使用ccall/cwrap生成的胶水代码，可能会爆栈
+
+### thread在WebAssembly中使用
+webassembly中使用thread, 需要浏览器支持SharedArrayBuffer, chrome70开始支持webassembly中使用thread, 不过默认不开启，需要自己设置chrome://flag,从
+chrome74开始默认支持了webassembly中使用thread
+#### ffmpeg解码使用pthread
+首先需要编译带pthread功能的静态库
+然后在打开解码器之前在解码器上下文上指定使用的线程的数量
+AVCodecContext* ctx = avcodec_alloc_context3(decode);
+ctx.thread_count = 2;
+

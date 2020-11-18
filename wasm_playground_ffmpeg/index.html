@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title>FFMPEG test</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <style>
+        .output {
+            text-align: center;
+        }
+        .videos .video {
+            width: 200px;
+            margin-right: 1rem;
+        }
+        .logs {
+            height: 150px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+<section class="hero is-primary">
+    <div class="hero-body">
+        <div class="container">
+            <h1 class="title">
+                FFMPEG.WASM
+            </h1>
+
+            <h2 class="subtitle">
+                Playground
+            </h2>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="row output"></div>
+    <br>
+
+    <div class="row">
+        <div class="videos"></div>
+
+        <input id="uploader" name="file" type="file" accept="video/*">
+    </div>
+    <br>
+
+    <div class="row actions">
+        <div class="button is-primary merge">Merge</div>
+    </div>
+    <br>
+
+    <div class="row logs"></div>
+    <br>
+</section>
+
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.9.4/dist/ffmpeg.min.js"></script>
+<script>
+  const { createFFmpeg, fetchFile } = FFmpeg
+
+  const videosList = []
+  const ffmpeg = createFFmpeg()
+  ffmpeg.setLogger(({ type, message }) => {
+    const el = document.querySelector('.row.logs')
+    el.innerText += `[${type}] ${message}\n`
+    el.scrollTo(0, el.scrollHeight)
+  })
+
+  const uploaderEl = document.getElementById('uploader')
+  uploaderEl.addEventListener('change', onFileUpload)
+
+  const mergeButtonEl = document.querySelector('.button.merge')
+  mergeButtonEl.addEventListener('click', merge)
+
+  function onFileUpload ({ target: { files }}) {
+    if (!files.length) {
+      return
+    }
+
+    videosList.push(files[0])
+
+    const video = document.createElement('video')
+    video.classList.add('video')
+    video.controls = true
+    video.src = URL.createObjectURL(files[0])
+    video.load()
+
+    uploaderEl.value = null
+
+    document
+      .querySelector('.videos')
+      .appendChild(video)
+  }
+
+  async function merge () {
+    mergeButtonEl.setAttribute('disabled', 'disabled')
+
+    await ffmpeg.load()
+
+    const inputs = []
+    const filterInputs = []
+    for (let i = 0; i < videosList.length; i++) {
+      const video = videosList[i]
+
+      inputs.push('-i', video.name)
+
+      filterInputs.push(`[${i}:v]`, `[${i}:a]`)
+
+      ffmpeg.FS('writeFile', video.name, await fetchFile(video))
+    }
+
+    await ffmpeg.run(...inputs,
+      '-filter_complex', `${filterInputs.join(' ')} concat=n=${videosList.length}:v=1:a=1 [v] [a]`,
+      '-map', '[v]',
+      '-map', '[a]',
+      'output.mp4')
+
+    const data = ffmpeg.FS('readFile', 'output.mp4')
+    const output = document.createElement('video')
+    output.src = URL.createObjectURL(new Blob([data.buffer], {
+      type: 'video/mp4'
+    }))
+    output.controls = true
+    output.load()
+
+    document
+      .querySelector('.row.output')
+      .appendChild(output)
+  }
+</script>
+</body>
+</html>

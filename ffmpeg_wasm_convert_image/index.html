@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>FFmpeg wasm sample</h1>
+    <div>
+        <input type="file" id="uploader">
+    </div>
+    <div>
+        <img id="picture" src="" alt="picture"/>
+    </div>
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.9.5/dist/ffmpeg.min.js"></script>  
+
+    <script>
+        const {createFFmpeg, fetchFile} = FFmpeg;
+        const ffmpeg = createFFmpeg({log:true});
+        const transcode = async({target: {files}}) => {
+            const { name } = files[0];
+                await ffmpeg.load();
+                ffmpeg.FS('writeFile', name, await fetchFile(files[0]));
+                const output = 'output.jpg';
+                await ffmpeg.run('-i', name, '-vf', 'hue=s=0', output);
+                const data = ffmpeg.FS('readFile', output);
+
+                const container = document.getElementById('picture');
+                const reader = new FileReader();
+                reader.readAsDataURL(new Blob([data.buffer]));
+                reader.onloadend = function() {
+                    console.log("data", reader.result);
+                    container.src = reader.result;
+                }
+        }
+        document.getElementById('uploader').addEventListener('change', transcode);
+    </script>
+</body>
+</html>
