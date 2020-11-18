@@ -7,6 +7,7 @@ emcc web.c process.c dist/lib/libavformat.a dist/lib/libavcodec.a dist/lib/libav
  -I "dist/include" \
  -s WASM=1 \
  -s TOTAL_MEMORY=${TOTAL_MEMORY} \
+ -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap"]' \
  -s ALLOW_MEMORY_GROWTH=1 \
  -o libffmpeg.js
 echo "finished Build"
