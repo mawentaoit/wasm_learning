@@ -22,6 +22,7 @@ int g_int = 42;
 double g_double = 3.1415926;
 
 EM_PORT_API(int*) get_int_ptr() {
+    std::cout << "&g_int value: " << &g_int << std::endl;
     return &g_int;
 }
 

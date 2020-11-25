@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ffmpeg 视频裁剪功能</title>
+</head>
+<body>
+    <h1>FFmpeg wasm Video Cut</h1>
+    <form style="margin-bottom: 20px;">
+        <label>起始时间(秒)</label><input id = "start_time" type="number" step="1" value="0" required name="time">
+        <label>结束时间(秒)</label><input id = "end_time" type="number" step="1" value="0" required name="time">
+        <p>请选择一个视频</p>
+        <input type="file" required name="file">
+    </form>
+
+    <video id="player" controls></video>
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.9.5/dist/ffmpeg.min.js"></script>
+    
+    <script>
+        const {createFFmpeg, fetchFile} = FFmpeg;
+        const ffmpeg = createFFmpeg({log:true});
+        const videocut = async({target: {files}}) => {
+            console.log("进入ffmpeg处理函数");
+            let start = document.getElementById('start_time').value;
+            let end = document.getElementById('end_time').value;
+            const {name} = files[0];
+            await ffmpeg.load();
+            ffmpeg.FS('writeFile', name, await fetchFile(files[0]));
+            const output = 'output.mp4';
+            await ffmpeg.run('-i', name, '-ss', start, '-c', 'copy', '-to', end, output);
+            const data = ffmpeg.FS('readFile', output);
+            const video = document.getElementById('player');
+            video.src = URL.createObjectURL(new Blob([data.buffer], {type: 'video/mp4'}));
+        }
+        let form = document.querySelector('form');
+        form.file.onchange = videocut;
+    </script>
+</body>
+</html>
